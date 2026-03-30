@@ -11,6 +11,7 @@ import { initInlineVideos, destroyInlineVideos } from './inline-video.js';
 import { initModalDelegation, initModals, destroyModals } from './modal.js';
 import { initFontSizeDetect, initFooterYear, initSkipLink } from './utilities.js';
 import { initNavScrollHide, destroyNavScrollHide } from './nav.js';
+import { initFormValidation, destroyFormValidation } from './form-validate.js';
 
 gsap.registerPlugin(CustomEase);
 
@@ -62,6 +63,7 @@ function initBeforeEnterFunctions(next) {
   destroySliders();
   destroyInlineVideos();
   destroyModals();
+  destroyFormValidation();
 }
 
 function initAfterEnterFunctions(next) {
@@ -75,6 +77,7 @@ function initAfterEnterFunctions(next) {
   if (has('[data-slider]'))                         initSliders(nextPage);
   if (has('[data-video]'))                          initInlineVideos(nextPage);
   if (has('dialog'))                                initModals(nextPage);
+  if (has('[data-form-validate]'))                  initFormValidation(nextPage);
   if (has('[data-footer-year]'))                    initFooterYear(nextPage);
 
   // Re-evaluate inline scripts inside the new container (Webflow embeds)
