@@ -1,0 +1,17 @@
+{
+  "library": {
+    "name": "nxzen Components",
+    "components": [
+      "./src/components/PixelBlast/PixelBlast.webflow.tsx"
+    ],
+    "description": "Code components for nxzen",
+    "id": "nxzen-components"
+  },
+  "telemetry": {
+    "global": {
+      "allowTelemetry": true,
+      "lastPrompted": 1774262496429,
+      "version": "1.13.0"
+    }
+  }
+}
