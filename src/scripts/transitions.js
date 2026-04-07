@@ -14,6 +14,7 @@ import { initNavScrollHide, destroyNavScrollHide } from './nav.js';
 import { initFormValidation, destroyFormValidation } from './form-validate.js';
 import { initContentRevealScroll, destroyContentRevealScroll } from './reveal.js';
 import { initNumberOdometer, destroyNumberOdometer } from './odometer.js';
+import { initMediaSetup, destroyMediaSetup } from './media.js';
 
 gsap.registerPlugin(CustomEase);
 
@@ -68,6 +69,7 @@ function initBeforeEnterFunctions(next) {
   destroyFormValidation();
   destroyContentRevealScroll();
   destroyNumberOdometer();
+  destroyMediaSetup();
 }
 
 function initAfterEnterFunctions(next) {
@@ -85,6 +87,7 @@ function initAfterEnterFunctions(next) {
   if (has('[data-footer-year]'))                    initFooterYear(nextPage);
   if (has('[data-reveal-group]'))                   initContentRevealScroll(nextPage);
   if (has('[data-odometer-group]'))                 initNumberOdometer(nextPage);
+  if (has('[data-media-init]'))                     initMediaSetup(nextPage);
 
   // Re-evaluate inline scripts inside the new container (Webflow embeds)
   reinitScripts(nextPage);
