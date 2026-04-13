@@ -201,8 +201,10 @@ function buildRollerDOM(el, segments, step, grow) {
     if (seg.type === 'static') {
       const span = document.createElement('span');
       span.setAttribute('data-odometer-part', 'static');
+      span.style.display = 'inline-block';
       span.style.height = step + 'em';
       span.style.lineHeight = step;
+      span.style.verticalAlign = 'top';
       span.textContent = seg.char;
       el.appendChild(span);
       if (grow && seg.hidden) {
@@ -213,11 +215,16 @@ function buildRollerDOM(el, segments, step, grow) {
     }
     const mask = document.createElement('span');
     mask.setAttribute('data-odometer-part', 'mask');
+    mask.style.display = 'inline-block';
     mask.style.height = step + 'em';
     mask.style.lineHeight = step;
+    mask.style.overflow = 'hidden';
+    mask.style.verticalAlign = 'top';
     const roller = document.createElement('span');
     roller.setAttribute('data-odometer-part', 'roller');
+    roller.style.display = 'block';
     roller.style.lineHeight = step;
+    roller.style.whiteSpace = 'pre';
 
     const digits = [];
     for (let d = 0; d < totalCells; d++) {
