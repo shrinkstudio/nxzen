@@ -16,6 +16,7 @@ import { initContentRevealScroll, destroyContentRevealScroll } from './reveal.js
 import { initNumberOdometer, destroyNumberOdometer } from './odometer.js';
 import { initMediaSetup, destroyMediaSetup } from './media.js';
 import { initReadTime, destroyReadTime } from './read-time.js';
+import { initTOC, destroyTOC } from './toc.js';
 
 gsap.registerPlugin(CustomEase);
 
@@ -72,6 +73,7 @@ function initBeforeEnterFunctions(next) {
   destroyNumberOdometer();
   destroyMediaSetup();
   destroyReadTime();
+  destroyTOC();
 }
 
 function initAfterEnterFunctions(next) {
@@ -91,6 +93,7 @@ function initAfterEnterFunctions(next) {
   if (has('[data-odometer-group]'))                 initNumberOdometer(nextPage);
   if (has('[data-media-init]'))                     initMediaSetup(nextPage);
   if (has('[data-read-time]'))                      initReadTime(nextPage);
+  if (has('[data-toc-source]'))                     initTOC(nextPage);
 
   // Re-evaluate inline scripts inside the new container (Webflow embeds)
   reinitScripts(nextPage);
