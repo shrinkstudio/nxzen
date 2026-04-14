@@ -62,6 +62,7 @@ export function initTOC(scope) {
 
     // Clone template and populate
     const link = template.cloneNode(true);
+    link.classList.remove(activeClass);
     const textEl = link.querySelector('[data-toc-text]') || link;
     textEl.textContent = heading.textContent.trim();
 
