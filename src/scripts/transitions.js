@@ -114,124 +114,39 @@ function initAfterEnterFunctions(next) {
 
 
 // -----------------------------------------
-// PAGE TRANSITIONS (Pixel Grid)
+// PAGE TRANSITIONS (Fade + H1 Reveal)
 // -----------------------------------------
-
-const pixelHorizontalAmount = 12;
-const transitionDuration = 1;
-const pixelFadeDuration = 0.2;
-const pixelOverlap = 0.3;
 
 function runPageOnceAnimation(next) {
   const tl = gsap.timeline();
+
   tl.call(() => {
     resetPage(next);
   }, null, 0);
+
   return tl;
 }
 
 function runPageLeaveAnimation(current, next) {
-  const tl = gsap.timeline();
+  const tl = gsap.timeline({
+    onComplete: () => { current.remove(); }
+  });
 
   if (reducedMotion) {
-    tl.set(current, { autoAlpha: 0 });
-    tl.call(() => current.remove(), null, 0);
-    return tl;
+    return tl.set(current, { autoAlpha: 0 });
   }
 
-  // Run PixelGrid Helper
-  const isPortrait = window.innerHeight > window.innerWidth;
-  pixelGrid(isPortrait);
-
-  const transitionWrap = document.querySelector("[data-transition-wrap]");
-  const transitionPanel = transitionWrap.querySelector("[data-transition-panel]");
-  const lines = Array.from(transitionPanel.querySelectorAll("[data-transition-col]"));
-  const allPixels = transitionPanel.querySelectorAll("[data-transition-pixel]");
-
-  const overlap = Math.max(0, Math.min(1, pixelOverlap));
-  const clipFrom = isPortrait
-    ? "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)"
-    : "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)";
-  const clipTo = isPortrait
-    ? "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)"
-    : "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)";
-
-  const clipStart = Math.min(pixelFadeDuration, transitionDuration * 0.5);
-  const clipDuration = Math.max(0.001, transitionDuration - 2 * clipStart);
-  const stepDur = clipDuration / Math.max(1, pixelHorizontalAmount);
-  const transitionEndDelay = transitionDuration / Math.max(1, pixelHorizontalAmount);
-
-  gsap.set(allPixels, { opacity: 0, willChange: "opacity" });
-  gsap.set(transitionPanel, { opacity: 1, willChange: "opacity" });
-  gsap.set(next, {
-    autoAlpha: 1,
-    clipPath: clipFrom,
-    webkitClipPath: clipFrom,
-    willChange: "clip-path",
-    force3D: true,
-    maxHeight: "100dvh"
-  });
-
-  lines.forEach((line, i) => {
-    const pixels = Array.from(line.querySelectorAll("[data-transition-pixel]"));
-    if (!pixels.length) return;
-
-    const revealTime = clipStart + i * stepDur;
-    const fillStart = Math.max(0, revealTime - pixelFadeDuration);
-    const fadeStart = Math.min(transitionDuration, revealTime + stepDur);
-    const fadeEnd = Math.min(transitionDuration, fadeStart + pixelFadeDuration);
-    const perPixelMin = pixelFadeDuration / pixels.length;
-    const perPixelDur = perPixelMin * (1 - overlap) + pixelFadeDuration * overlap;
-    const spread = Math.max(0, pixelFadeDuration - perPixelDur);
-
-    // Animate Pixels In
-    tl.to(pixels, {
-      opacity: 1,
-      duration: Math.max(0.001, perPixelDur),
-      ease: "none",
-      stagger: {
-        amount: spread,
-        from: "random"
-      }
-    }, fillStart);
-
-    // Animate Pixels Out
-    tl.to(pixels, {
-      opacity: 0,
-      duration: Math.max(0.001, perPixelDur),
-      ease: "none",
-      stagger: {
-        amount: spread,
-        from: "random"
-      }
-    }, fadeStart);
-  });
-
-  // Animate Clip Path
-  tl.to(next, {
-    clipPath: clipTo,
-    webkitClipPath: clipTo,
-    ease: `steps(${pixelHorizontalAmount}, start)`,
-    duration: clipDuration
-  }, clipStart);
-
-  tl.set(next, {
-    clearProps: "clipPath,webkitClipPath,willChange,force3D,maxHeight"
-  }, clipStart + clipDuration);
-
-  tl.call(() => {
-    current.remove();
-  }, null, transitionDuration + transitionEndDelay);
-
-  tl.set(allPixels, { clearProps: "willChange" }, transitionDuration + transitionEndDelay);
-  tl.set(transitionPanel, { clearProps: "willChange" }, transitionDuration + transitionEndDelay);
+  tl.to(current, {
+    autoAlpha: 0,
+    ease: "power1.in",
+    duration: 0.5,
+  }, 0);
 
   return tl;
 }
 
 function runPageEnterAnimation(next) {
   const tl = gsap.timeline();
-  const transitionEndDelay = transitionDuration / Math.max(1, pixelHorizontalAmount);
 
   if (reducedMotion) {
     tl.set(next, { autoAlpha: 1 });
@@ -240,63 +155,34 @@ function runPageEnterAnimation(next) {
     return new Promise(resolve => tl.call(resolve, null, "pageReady"));
   }
 
-  tl.add("pageReady", transitionDuration + transitionEndDelay);
-  tl.call(resetPage, [next], "pageReady");
+  tl.add("startEnter", 0);
 
-  return new Promise((resolve) => {
-    tl.call(resolve, null, "pageReady");
-  });
-}
+  tl.fromTo(next, {
+    autoAlpha: 0,
+  }, {
+    autoAlpha: 1,
+    ease: "power1.inOut",
+    duration: 0.75,
+  }, "startEnter");
 
-
-// -----------------------------------------
-// HELPER: Pixel Grid
-// -----------------------------------------
-
-function pixelGrid(isPortrait) {
-  const panel = document.querySelector("[data-transition-panel]");
-  if (!panel) return;
-
-  const rect = panel.getBoundingClientRect();
-  panel.style.flexDirection = isPortrait ? "column" : "row";
-
-  const lineSizePx = isPortrait
-    ? rect.height / pixelHorizontalAmount
-    : rect.width / pixelHorizontalAmount;
-  const crossAmount = Math.ceil(
-    (isPortrait ? rect.width : rect.height) / lineSizePx
-  );
-
-  let lines = panel.querySelectorAll("[data-transition-col]");
-  const lineTemplate = lines[0];
-  const pixelTemplate = lineTemplate.querySelector("[data-transition-pixel]");
-
-  if (lines.length !== pixelHorizontalAmount) {
-    const frag = document.createDocumentFragment();
-    for (let i = 0; i < pixelHorizontalAmount; i++) {
-      frag.appendChild(lineTemplate.cloneNode(false));
-    }
-    panel.replaceChildren(frag);
-    lines = panel.querySelectorAll("[data-transition-col]");
+  const h1 = next.querySelector('h1');
+  if (h1) {
+    tl.fromTo(h1, {
+      yPercent: 25,
+      autoAlpha: 0,
+    }, {
+      yPercent: 0,
+      autoAlpha: 1,
+      ease: "expo.out",
+      duration: 1,
+    }, "< 0.3");
   }
 
-  lines.forEach((line) => {
-    line.style.flexDirection = isPortrait ? "row" : "column";
-    line.style.flex = "1 1 auto";
-    line.style.justifyContent = "center";
+  tl.add("pageReady");
+  tl.call(resetPage, [next], "pageReady");
 
-    const diff = crossAmount - line.childElementCount;
-    if (diff > 0) {
-      const frag = document.createDocumentFragment();
-      for (let i = 0; i < diff; i++) {
-        frag.appendChild(pixelTemplate.cloneNode(true));
-      }
-      line.appendChild(frag);
-    } else if (diff < 0) {
-      for (let i = diff; i < 0; i++) {
-        line.lastElementChild.remove();
-      }
-    }
+  return new Promise(resolve => {
+    tl.call(resolve, null, "pageReady");
   });
 }
 
