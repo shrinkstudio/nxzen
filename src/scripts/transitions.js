@@ -195,11 +195,10 @@ function runPageEnterAnimation(next) {
 // -----------------------------------------
 
 barba.hooks.beforeEnter(data => {
-  // Freeze old page at current scroll position so crossfade is clean
-  const scrollY = window.scrollY || document.documentElement.scrollTop;
+  // Fix old page at top — the fade masks the scroll jump
   gsap.set(data.current.container, {
     position: "fixed",
-    top: -scrollY,
+    top: 0,
     left: 0,
     right: 0,
   });
