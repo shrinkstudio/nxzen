@@ -195,12 +195,25 @@ function runPageEnterAnimation(next) {
 // -----------------------------------------
 
 barba.hooks.beforeEnter(data => {
+  // Freeze old page at current scroll position so crossfade is clean
+  const scrollY = window.scrollY || document.documentElement.scrollTop;
+  gsap.set(data.current.container, {
+    position: "fixed",
+    top: -scrollY,
+    left: 0,
+    right: 0,
+  });
+
+  // Position new page at top
   gsap.set(data.next.container, {
     position: "fixed",
     top: 0,
     left: 0,
     right: 0,
   });
+
+  // Reset scroll immediately now both pages are fixed
+  window.scrollTo(0, 0);
 
   if (lenis && typeof lenis.stop === "function") {
     lenis.stop();
