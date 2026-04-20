@@ -19,6 +19,7 @@ import { initReadTime, destroyReadTime } from './read-time.js';
 import { initTOC, destroyTOC } from './toc.js';
 import { initPixelBlast, destroyPixelBlast } from './pixel-blast.js';
 import { initHighlightText, destroyHighlightText } from './highlight-text.js';
+import { initMiniShowreel, destroyMiniShowreel } from './mini-showreel.js';
 
 gsap.registerPlugin(CustomEase);
 
@@ -78,6 +79,7 @@ function initBeforeEnterFunctions(next) {
   destroyTOC();
   destroyPixelBlast();
   destroyHighlightText();
+  destroyMiniShowreel();
 }
 
 function initAfterEnterFunctions(next) {
@@ -100,6 +102,7 @@ function initAfterEnterFunctions(next) {
   if (has('[data-toc-source]'))                     initTOC(nextPage);
   if (has('[data-pixel-blast]'))                    initPixelBlast(nextPage);
   if (has('[data-highlight-text]'))                 initHighlightText(nextPage);
+  if (has('[data-mini-showreel-open]'))             initMiniShowreel(nextPage);
 
   // Re-evaluate inline scripts inside the new container (Webflow embeds)
   reinitScripts(nextPage);
