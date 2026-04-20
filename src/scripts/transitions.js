@@ -18,6 +18,7 @@ import { initMediaSetup, destroyMediaSetup } from './media.js';
 import { initReadTime, destroyReadTime } from './read-time.js';
 import { initTOC, destroyTOC } from './toc.js';
 import { initPixelBlast, destroyPixelBlast } from './pixel-blast.js';
+import { initHighlightText, destroyHighlightText } from './highlight-text.js';
 
 gsap.registerPlugin(CustomEase);
 
@@ -76,6 +77,7 @@ function initBeforeEnterFunctions(next) {
   destroyReadTime();
   destroyTOC();
   destroyPixelBlast();
+  destroyHighlightText();
 }
 
 function initAfterEnterFunctions(next) {
@@ -97,6 +99,7 @@ function initAfterEnterFunctions(next) {
   if (has('[data-read-time]'))                      initReadTime(nextPage);
   if (has('[data-toc-source]'))                     initTOC(nextPage);
   if (has('[data-pixel-blast]'))                    initPixelBlast(nextPage);
+  if (has('[data-highlight-text]'))                 initHighlightText(nextPage);
 
   // Re-evaluate inline scripts inside the new container (Webflow embeds)
   reinitScripts(nextPage);
