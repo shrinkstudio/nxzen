@@ -21,6 +21,7 @@ import { initPixelBlast, destroyPixelBlast } from './pixel-blast.js';
 import { initHighlightText, destroyHighlightText } from './highlight-text.js';
 import { initMiniShowreel, destroyMiniShowreel } from './mini-showreel.js';
 import { initDirectionalHover, destroyDirectionalHover } from './directional-hover.js';
+import { initVimeoPlayer, destroyVimeoPlayer } from './vimeo-player.js';
 
 gsap.registerPlugin(CustomEase);
 
@@ -82,6 +83,7 @@ function initBeforeEnterFunctions(next) {
   destroyHighlightText();
   destroyMiniShowreel();
   destroyDirectionalHover();
+  destroyVimeoPlayer();
 }
 
 function initAfterEnterFunctions(next) {
@@ -106,6 +108,7 @@ function initAfterEnterFunctions(next) {
   if (has('[data-highlight-text]'))                 initHighlightText(nextPage);
   if (has('[data-mini-showreel-open]'))             initMiniShowreel(nextPage);
   if (has('[data-directional-hover]'))              initDirectionalHover(nextPage);
+  if (has('[data-vimeo-player-init]'))              initVimeoPlayer(nextPage);
 
   // Re-evaluate inline scripts inside the new container (Webflow embeds)
   reinitScripts(nextPage);
