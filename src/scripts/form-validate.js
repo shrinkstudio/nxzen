@@ -257,9 +257,19 @@ function setupForm(formContainer) {
   });
 
   // Dynamic redirect — poll for Webflow's .w-form-done after submit
-  var redirectUrl = form.getAttribute('data-form-redirect');
-  if (redirectUrl && redirectUrl.charAt(0) !== '/' && redirectUrl.indexOf('http') !== 0) {
-    redirectUrl = '/' + redirectUrl;
+  var redirectPrefix = form.getAttribute('data-form-redirect-prefix') || '';
+  var redirectSlug = form.getAttribute('data-form-redirect') || '';
+  var redirectUrl = null;
+  if (redirectSlug) {
+    if (redirectSlug.indexOf('http') === 0) {
+      redirectUrl = redirectSlug;
+    } else {
+      // Build path: /prefix/slug
+      var parts = [redirectPrefix, redirectSlug].filter(Boolean).map(function (p) {
+        return p.replace(/^\/|\/$/g, '');
+      });
+      redirectUrl = '/' + parts.join('/');
+    }
   }
 
   // Submit handlers
