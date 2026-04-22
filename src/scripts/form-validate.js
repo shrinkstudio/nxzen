@@ -243,24 +243,12 @@ function setupForm(formContainer) {
     }
   });
 
-  // Redirect on success — watch for Webflow's .w-form-done becoming visible
-  var redirectUrl = formContainer.getAttribute('data-form-redirect');
+  // Dynamic redirect — set native Webflow redirect attrs on the <form>
+  // Put data-form-redirect on the <form> element (CMS-bound slug works)
+  var redirectUrl = form.getAttribute('data-form-redirect');
   if (redirectUrl) {
-    var observer = new MutationObserver(function (mutations) {
-      mutations.forEach(function (m) {
-        if (m.type === 'attributes' && m.attributeName === 'style') {
-          var done = formContainer.querySelector('.w-form-done');
-          if (done && done.style.display !== 'none' && done.style.display !== '') {
-            observer.disconnect();
-            window.location.href = redirectUrl;
-          }
-        }
-      });
-    });
-    var doneEl = formContainer.querySelector('.w-form-done');
-    if (doneEl) {
-      observer.observe(doneEl, { attributes: true, attributeFilter: ['style'] });
-    }
+    form.setAttribute('redirect', redirectUrl);
+    form.setAttribute('data-redirect', redirectUrl);
   }
 
   // Submit handlers
