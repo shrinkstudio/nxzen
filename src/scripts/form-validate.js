@@ -175,6 +175,19 @@ function setupForm(formContainer) {
         return;
       }
       realSubmitInput.click();
+
+      // After Webflow submits, poll for .w-form-done visibility then redirect
+      if (redirectUrl) {
+        var attempts = 0;
+        var pollId = setInterval(function () {
+          var done = formContainer.querySelector('.w-form-done');
+          if (done && done.offsetParent !== null) {
+            clearInterval(pollId);
+            window.location.href = redirectUrl;
+          }
+          if (++attempts > 50) clearInterval(pollId); // bail after ~5s
+        }, 100);
+      }
     }
   }
 
@@ -243,12 +256,10 @@ function setupForm(formContainer) {
     }
   });
 
-  // Dynamic redirect — set native Webflow redirect attrs on the <form>
-  // Put data-form-redirect on the <form> element (CMS-bound slug works)
+  // Dynamic redirect — poll for Webflow's .w-form-done after submit
   var redirectUrl = form.getAttribute('data-form-redirect');
-  if (redirectUrl) {
-    form.setAttribute('redirect', redirectUrl);
-    form.setAttribute('data-redirect', redirectUrl);
+  if (redirectUrl && redirectUrl.charAt(0) !== '/' && redirectUrl.indexOf('http') !== 0) {
+    redirectUrl = '/' + redirectUrl;
   }
 
   // Submit handlers
