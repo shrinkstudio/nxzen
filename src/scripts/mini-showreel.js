@@ -76,6 +76,20 @@ export function initMiniShowreel(scope) {
     if (pw) pw.style.zIndex = pwZ;
   }
 
+  function playFor(name) {
+    var wrap = getPW(name);
+    if (!wrap) return;
+    var playBtn = wrap.querySelector('[data-vimeo-control="play"]');
+    if (playBtn) playBtn.click();
+  }
+
+  function stopFor(name) {
+    var wrap = getPW(name);
+    if (!wrap) return;
+    var pauseBtn = wrap.querySelector('[data-vimeo-control="pause"]');
+    if (pauseBtn) pauseBtn.click();
+  }
+
   function openBy(name) {
     if (!name || isOpen) return;
 
@@ -94,6 +108,7 @@ export function initMiniShowreel(scope) {
 
     zOn();
     setStatus('active');
+    playFor(n);
 
     const state = Flip.getState(pw);
     place(pw, rectFor(tg));
@@ -110,6 +125,7 @@ export function initMiniShowreel(scope) {
     if (!isOpen || !pw) return;
     if (nameOrEmpty && nameOrEmpty !== n) return;
 
+    stopFor(n);
     setStatus('not-active');
 
     const state = Flip.getState(pw);
