@@ -24,6 +24,7 @@ import { initDirectionalHover, destroyDirectionalHover } from './directional-hov
 import { initVimeoPlayer, destroyVimeoPlayer } from './vimeo-player.js';
 import { initSocialShare, destroySocialShare } from './social-share.js';
 import { initAcceleratingGlobe, destroyAcceleratingGlobe } from './accelerating-globe.js';
+import { initCopyLink, destroyCopyLink } from './copy-link.js';
 
 gsap.registerPlugin(CustomEase);
 
@@ -63,6 +64,7 @@ function initOnceFunctions() {
   initModalDelegation();
   initFontSizeDetect();
   initSkipLink();
+  initCopyLink();
 }
 
 function initBeforeEnterFunctions(next) {
