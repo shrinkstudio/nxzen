@@ -270,7 +270,7 @@ export function initPixelBlast(scope) {
 
 export function destroyPixelBlast() {
   instances.forEach(inst => {
-    cancelAnimationFrame(inst.raf);
+    inst.destroy();
     inst.ro.disconnect();
     inst.canvas.removeEventListener('pointerdown', inst.onPointer);
     const gl = inst.gl;
@@ -375,6 +375,7 @@ function createInstance(el) {
   let time = 0;
   let raf = 0;
   let revealed = false;
+  let destroyed = false;
 
   function bindQuad() {
     const loc = gl.getAttribLocation(program, 'aPosition');
@@ -384,6 +385,7 @@ function createInstance(el) {
   }
 
   function frame() {
+    if (destroyed) return;
     raf = requestAnimationFrame(frame);
     const w = canvas.width, h = canvas.height;
     if (w === 0 || h === 0) return;
@@ -428,5 +430,5 @@ function createInstance(el) {
 
   raf = requestAnimationFrame(frame);
 
-  return { canvas, gl, program, quadBuf, raf, ro, onPointer };
+  return { canvas, gl, program, quadBuf, raf, ro, onPointer, destroy() { destroyed = true; cancelAnimationFrame(raf); } };
 }
