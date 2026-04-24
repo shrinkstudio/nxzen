@@ -23,6 +23,7 @@ import { initMiniShowreel, destroyMiniShowreel } from './mini-showreel.js';
 import { initDirectionalHover, destroyDirectionalHover } from './directional-hover.js';
 import { initVimeoPlayer, destroyVimeoPlayer } from './vimeo-player.js';
 import { initSocialShare, destroySocialShare } from './social-share.js';
+import { initAcceleratingGlobe, destroyAcceleratingGlobe } from './accelerating-globe.js';
 
 gsap.registerPlugin(CustomEase);
 
@@ -86,6 +87,7 @@ function initBeforeEnterFunctions(next) {
   destroyDirectionalHover();
   destroyVimeoPlayer();
   destroySocialShare();
+  destroyAcceleratingGlobe();
 }
 
 function initAfterEnterFunctions(next) {
@@ -112,6 +114,7 @@ function initAfterEnterFunctions(next) {
   if (has('[data-directional-hover]'))              initDirectionalHover(nextPage);
   if (has('[data-vimeo-player-init]'))              initVimeoPlayer(nextPage);
   if (has('[data-social-share]'))                   initSocialShare(nextPage);
+  if (has('[data-accelerating-globe]'))             initAcceleratingGlobe(nextPage);
 
   // Re-evaluate inline scripts inside the new container (Webflow embeds)
   reinitScripts(nextPage);
