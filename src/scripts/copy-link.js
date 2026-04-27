@@ -18,9 +18,10 @@ export function initCopyLink() {
 
     if (navigator.clipboard) {
       navigator.clipboard.writeText(fullUrl).then(function () {
-        var prev = btn.textContent;
-        btn.textContent = 'Copied!';
-        setTimeout(function () { btn.textContent = prev || 'Copy Campaign URL'; }, 1500);
+        var textEl = btn.querySelector('h1,h2,h3,h4,h5,h6,span,p') || btn;
+        var prev = textEl.textContent;
+        textEl.textContent = 'Copied!';
+        setTimeout(function () { textEl.textContent = prev || 'Copy Campaign URL'; }, 1500);
       }).catch(function () {
         prompt('Copy this URL:', fullUrl);
       });
