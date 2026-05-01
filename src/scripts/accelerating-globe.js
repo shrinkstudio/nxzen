@@ -1,7 +1,7 @@
 // -----------------------------------------
 // ACCELERATING GLOBE
 // [data-accelerating-globe] with 8+ [data-accelerating-globe-circle] children
-// Loops a width animation, speeds up on scroll velocity
+// Loops a width animation at a constant speed
 // -----------------------------------------
 
 let cleanups = [];
@@ -36,39 +36,7 @@ export function initAcceleratingGlobe(scope) {
       tl.fromTo(el, { width: fromW }, { width: toW }, i === 0 ? 0 : '<');
     });
 
-    var lastY = window.scrollY;
-    var lastT = performance.now();
-    var stopTimeout;
-
-    function onScroll() {
-      var now = performance.now();
-      var dy = window.scrollY - lastY;
-      var dt = now - lastT;
-      lastY = window.scrollY;
-      lastT = now;
-
-      var velocity = dt > 0 ? (dy / dt) * 1000 : 0;
-      var boost = Math.abs(velocity * 0.005);
-      var targetScale = boost + 1;
-
-      tl.timeScale(targetScale);
-
-      clearTimeout(stopTimeout);
-      stopTimeout = setTimeout(function () {
-        gsap.to(tl, {
-          timeScale: 1,
-          duration: 0.6,
-          ease: 'power2.out',
-          overwrite: true
-        });
-      }, 100);
-    }
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-
     cleanups.push(function () {
-      window.removeEventListener('scroll', onScroll);
-      clearTimeout(stopTimeout);
       tl.kill();
     });
   });
