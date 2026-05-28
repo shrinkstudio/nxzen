@@ -26,6 +26,7 @@ import { initSocialShare } from './social-share.js';
 import { initAcceleratingGlobe } from './accelerating-globe.js';
 import { initCopyLink } from './copy-link.js';
 import { initPdfEmbed } from './pdf-embed.js';
+import { initHubspot } from './hubspot.js';
 
 gsap.registerPlugin(CustomEase);
 
@@ -79,6 +80,7 @@ function init() {
   if (has('[data-social-share]'))                   initSocialShare(document);
   if (has('[data-accelerating-globe]'))             initAcceleratingGlobe(document);
   if (has('[data-pdf-embed]'))                      initPdfEmbed(document);
+  if (has('[data-hubspot]'))                        initHubspot(document);
 
   // Theme
   applyTheme();
