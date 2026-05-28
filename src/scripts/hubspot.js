@@ -3,7 +3,8 @@
 // Attribute-driven HubSpot form embedding.
 // Put data-hubspot="<form-id>" on any div.
 //
-// Configure portal + region site-wide via meta tags in Site Settings → Head Code:
+// Portal + region default to nxzen's HubSpot instance. To override site-wide
+// (e.g. if the portal ever changes), add meta tags in Site Settings → Head Code:
 //   <meta name="hubspot-portal" content="148378852">
 //   <meta name="hubspot-region" content="eu1">
 //
@@ -18,7 +19,8 @@
 //     to dataLayer so GA4 conversions can be wired through GTM.
 // -----------------------------------------
 
-const DEFAULT_REGION = "eu1";
+const DEFAULT_PORTAL = "148378852"; // nxzen — overridable via <meta name="hubspot-portal">
+const DEFAULT_REGION = "eu1";       // overridable via <meta name="hubspot-region">
 
 let scriptLoaded = false;
 let scriptLoading = null;
@@ -87,15 +89,8 @@ export function initHubspot(scope) {
   const els = scope.querySelectorAll("[data-hubspot]");
   if (!els.length) return;
 
-  const portalId = readMeta("hubspot-portal");
+  const portalId = readMeta("hubspot-portal") || DEFAULT_PORTAL;
   const region = readMeta("hubspot-region") || DEFAULT_REGION;
-
-  if (!portalId) {
-    console.warn(
-      '[hubspot] Missing <meta name="hubspot-portal"> — forms will not render.'
-    );
-    return;
-  }
 
   loadHubspotScript(region)
     .then(() => {
