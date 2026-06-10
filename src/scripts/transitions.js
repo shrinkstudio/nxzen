@@ -22,6 +22,7 @@ import { initHighlightText } from './highlight-text.js';
 import { initMiniShowreel } from './mini-showreel.js';
 import { initDirectionalHover } from './directional-hover.js';
 import { initVimeoPlayer } from './vimeo-player.js';
+import { initYouTubePlayer } from './youtube-player.js';
 import { initSocialShare } from './social-share.js';
 import { initAcceleratingGlobe } from './accelerating-globe.js';
 import { initCopyLink } from './copy-link.js';
@@ -81,6 +82,7 @@ function init() {
   if (has('[data-mini-showreel-open]'))             initMiniShowreel(document);
   if (has('[data-directional-hover]'))              initDirectionalHover(document);
   if (has('[data-vimeo-player-init]'))              initVimeoPlayer(document);
+  if (has('[data-youtube-player-init]'))            initYouTubePlayer(document);
   if (has('[data-social-share]'))                   initSocialShare(document);
   if (has('[data-accelerating-globe]'))             initAcceleratingGlobe(document);
   if (has('[data-pdf-embed]'))                      initPdfEmbed(document);
