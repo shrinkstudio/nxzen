@@ -26,7 +26,7 @@ import { initSocialShare } from './social-share.js';
 import { initAcceleratingGlobe } from './accelerating-globe.js';
 import { initCopyLink } from './copy-link.js';
 import { initPdfEmbed } from './pdf-embed.js';
-import { initHubspot } from './hubspot.js';
+import { initHubspot, eagerLoadHubspot } from './hubspot.js';
 
 gsap.registerPlugin(CustomEase);
 
@@ -56,6 +56,10 @@ function init() {
   initFontSizeDetect();
   initSkipLink();
   initCopyLink();
+
+  // Eagerly fetch third-party embeds so they're cached + globals are ready
+  // by the time the user navigates to a page that uses them.
+  eagerLoadHubspot();
 
   // Page-scoped modules
   if (document.querySelector('.nav'))               initNavScrollHide(document);

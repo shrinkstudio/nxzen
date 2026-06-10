@@ -44,7 +44,7 @@ function loadHubspotScript(region) {
   loadedRegion = region;
   scriptLoading = new Promise((resolve, reject) => {
     const s = document.createElement("script");
-    s.src = `//js-${region}.hsforms.net/forms/embed/v2.js`;
+    s.src = `https://js-${region}.hsforms.net/forms/embed/v2.js`;
     s.async = true;
     // Hint to Cookiebot's auto-blocker which categories this belongs to.
     s.setAttribute("data-cookieconsent", "statistics, marketing");
@@ -82,6 +82,16 @@ function renderForm(el, { portalId, region }) {
       });
     },
   });
+}
+
+// Start fetching the embed script on first page load so it's already cached
+// (and window.hbspt is ready) by the time the user navigates to a form page.
+// Safe to call multiple times — loadHubspotScript() short-circuits.
+// Cookiebot's auto-blocker still gates the script; if consent is denied at
+// load time, CookiebotOnAccept (wired in initHubspot) re-runs once granted.
+export function eagerLoadHubspot() {
+  const region = readMeta("hubspot-region") || DEFAULT_REGION;
+  loadHubspotScript(region).catch(() => { /* swallow — initHubspot will warn */ });
 }
 
 export function initHubspot(scope) {
