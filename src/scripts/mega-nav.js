@@ -122,6 +122,25 @@ export function initMegaNav() {
     gsap.set(backdrop, { autoAlpha: 0 });
   }
 
+  // MOBILE — anchor the fixed overlays to the *visible* bottom of the nav bar.
+  // The bar is sticky (top:0), but an announcement/banner rendered above it
+  // pushes it down, so the CSS `top: var(--nav-height)` (which is only the bar's
+  // own height) leaves the menu tucked under the bar. menuWrap IS the bar, so
+  // its rect bottom is the exact viewport offset we need — with a banner,
+  // without one (dismissed), or scrolled past it. Body scroll is locked while
+  // the menu is open, so the value stays stable until close.
+  function setMobileMenuTop() {
+    const offset = Math.round(menuWrap.getBoundingClientRect().bottom);
+    const val = offset > 0 ? offset + "px" : "";
+    if (navList) navList.style.top = val;
+    if (dropWrapper) dropWrapper.style.top = val;
+  }
+
+  function clearMobileMenuTop() {
+    if (navList) navList.style.top = "";
+    if (dropWrapper) dropWrapper.style.top = "";
+  }
+
   function measurePanel(name) {
     const el = getPanel(name);
     if (!el) return 0;
@@ -375,6 +394,7 @@ export function initMegaNav() {
     menuWrap.setAttribute("data-menu-open", "true");
     burger.setAttribute("aria-expanded", "true");
     document.body.style.overflow = "hidden";
+    setMobileMenuTop();
 
     const items = getNavItems();
     const tl = gsap.timeline();
@@ -406,6 +426,7 @@ export function initMegaNav() {
       onComplete() {
         document.body.style.overflow = "";
         state.mobileTl = null;
+        clearMobileMenuTop();
         setupMobile();
       },
     });
@@ -533,6 +554,7 @@ export function initMegaNav() {
         state.mobileMenuOpen = false;
         state.mobilePanelActive = null;
         document.body.style.overflow = "";
+        clearMobileMenuTop();
         resetDesktop();
       }
 
@@ -544,6 +566,9 @@ export function initMegaNav() {
         resetToggles();
         setupMobile();
       }
+
+      // Still mobile with the menu open — re-anchor to the bar's new bottom.
+      if (state.isMobile && state.mobileMenuOpen) setMobileMenuTop();
 
     }, 150);
   }
