@@ -39,6 +39,11 @@ export function initMegaNav() {
   const [lineTop, lineMid, lineBot] = ["top", "mid", "bot"].map(
     (id) => document.querySelector(`[data-burger-line='${id}']`)
   );
+  // Optional announcement/banner rendered above the sticky bar. It's hidden
+  // while the mobile menu is open so the menu reads as full-screen and its bar
+  // (logo / back / close) sits at the very top instead of below the banner.
+  // No-op on projects without one.
+  const banner = document.querySelector("[data-nav-banner]") || document.querySelector(".nav-banner-wrapper");
 
   // State
   const state = {
@@ -394,6 +399,7 @@ export function initMegaNav() {
     menuWrap.setAttribute("data-menu-open", "true");
     burger.setAttribute("aria-expanded", "true");
     document.body.style.overflow = "hidden";
+    if (banner) banner.style.display = "none";
     setMobileMenuTop();
 
     const items = getNavItems();
@@ -416,6 +422,10 @@ export function initMegaNav() {
 
     killMobile();
     killMobilePanel();
+
+    // Bring the banner back at the start of the close so it settles behind the
+    // still-opaque menu as it fades out, avoiding a pop at the very end.
+    if (banner) banner.style.display = "";
 
     menuWrap.setAttribute("data-menu-open", "false");
     state.mobileMenuOpen = false;
@@ -555,6 +565,7 @@ export function initMegaNav() {
         state.mobilePanelActive = null;
         document.body.style.overflow = "";
         clearMobileMenuTop();
+        if (banner) banner.style.display = "";
         resetDesktop();
       }
 
