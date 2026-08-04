@@ -1,33 +1,30 @@
 // -----------------------------------------
-// NAV TRACKING — Paid-media interaction attributes (HYBRID)
+// NAV TRACKING — Paid-media interaction attributes (MEGA NAV)
 // -----------------------------------------
-// The nav tracking scheme is split across two homes:
+// Stamps the paid-media data-track-* interaction schema onto the
+// mega-nav at page load. The nav is custom-coded markup (mega-nav__*
+// classes + data-* hooks), so a single JS decorator covers everything
+// — main menus, sub-menu panel links, CTAs and the whitepaper banner —
+// stamping the final rendered DOM. (Supersedes the earlier hybrid: the
+// old .nav component this project used before the mega-nav migration is
+// gone, so all tracking now lives here.)
 //
-//   • WEBFLOW (source of truth, editable by the paid/marketing team):
-//     the plain nav elements carry the attributes as Designer custom
-//     attributes — the 5 main menu items (Our Solutions, About Us,
-//     Our Clients, Insights & News, Careers) and the 2 About-Us
-//     sub-links (About Us, Our People). The service cards also carry
-//     the 3 STATIC attrs (event / name / type) in Webflow.
-//
-//   • THIS MODULE (JS): the elements Webflow structurally cannot
-//     attribute per-instance — they are component instances
-//     ("Button - Animated Icon", "Text Button - Animated Icon",
-//     "Nav Banner") which reject per-instance custom attributes — plus
-//     the service-card VALUE, which is per-service and can't be
-//     CMS-bound to an attribute via the Designer here. This module
-//     stamps the final rendered DOM at nav init:
-//       - Get in touch  → button
-//       - All Solutions, Learn more → sub_menu_item
-//       - Whitepaper banner → banner (also strips the legacy
-//         data-track-category/label/event the component prop renders)
-//       - Service cards → adds the per-service data-track-interaction-value
-//
-// Schema (matches the paid team's spec):
+// Schema (paid team's spec):
 //   data-track-event="ui_interaction"
 //   data-track-interaction-name="navigation_interaction"
 //   data-track-interaction-type="menu_item | sub_menu_item | button | banner"
 //   data-track-interaction-value="<lowercased label>"
+//
+// Markup hooks (mega-nav):
+//   [data-menu-wrap]                       — nav root
+//   .mega-nav__bar-link (:not(.is--back))  — top-level menu items (toggles + plain links)
+//   .mega-nav__bar-link-label              — label span inside a bar link
+//   .mega-nav__panel-link                  — dropdown/sub-menu links
+//   .mega-nav__panel-link-text             — label span inside a panel link
+//   .btn-icon-link.cc-text                 — in-panel buttons (Learn more, See all solutions)
+//   .btn-icon-link:not(.cc-text)           — primary CTA (Get in touch)
+//   a.u-link-cover                         — overlay cover links
+//   .nav-banner-wrapper                    — whitepaper banner (sits outside the nav)
 // -----------------------------------------
 
 const EVENT = 'ui_interaction';
@@ -36,13 +33,29 @@ const LEGACY_ATTRS = ['data-track-category', 'data-track-label', 'data-track-eve
 
 function toValue(text) {
   return (text || '')
-    .replace(/​/g, '')     // zero-width space (Webflow rich-text artifact)
+    .replace(/​/g, '')      // zero-width space (Webflow rich-text artifact)
     .replace(/\s+/g, ' ')
     .trim()
     .toLowerCase();
 }
 
-// Full stamp — replaces the legacy scheme and writes all four attrs.
+// Prefer the explicit label element; fall back to the first child block
+// (e.g. the Smart Utility link renders <div>title</div><div>desc</div>),
+// then to the element's own text.
+function labelOf(el) {
+  const span = el.querySelector('.mega-nav__bar-link-label, .mega-nav__panel-link-text');
+  if (span && span.textContent.trim()) return toValue(span.textContent);
+  const div = el.querySelector('div');
+  if (div && div.textContent.trim()) return toValue(div.textContent);
+  return toValue(el.textContent);
+}
+
+function slugValue(el) {
+  return ((el.getAttribute('href') || '').split('?')[0].replace(/\/$/, '').split('/').pop() || '')
+    .replace(/-/g, ' ');
+}
+
+// Replace the legacy scheme and write the four attrs.
 function stamp(el, type, value) {
   if (!el || !value) return;
   LEGACY_ATTRS.forEach((a) => el.removeAttribute(a));
@@ -54,34 +67,40 @@ function stamp(el, type, value) {
 
 export function initNavTrack(scope) {
   scope = scope || document;
+  const nav = scope.querySelector('[data-menu-wrap]');
 
-  // --- CTA button: Get in touch ("Button - Animated Icon" instance) ---
-  scope.querySelectorAll('.nav-cta-wrapper a[href]').forEach((el) => {
-    stamp(el, 'button', toValue(el.textContent));
-  });
+  if (nav) {
+    // Main menu items — dropdown toggles + top-level links (exclude the mobile Back button).
+    nav.querySelectorAll('.mega-nav__bar-link:not(.is--back)').forEach((el) => {
+      stamp(el, 'menu_item', labelOf(el));
+    });
 
-  // --- Mega-menu text buttons: All Solutions, Learn more ("Text Button" instances) ---
-  scope.querySelectorAll('.nav .btn-icon-link.cc-text').forEach((el) => {
-    stamp(el, 'sub_menu_item', toValue(el.textContent));
-  });
+    // Sub-menu items — dropdown panel links.
+    nav.querySelectorAll('.mega-nav__panel-link').forEach((el) => {
+      stamp(el, 'sub_menu_item', labelOf(el));
+    });
 
-  // --- Whitepaper banner ("Nav Banner" instance, lives outside .nav) ---
-  // Value is static per the paid team's spec; also strips the legacy
-  // data-track-* that the component's Track props render.
+    // In-panel text buttons — Learn more, See all solutions.
+    nav.querySelectorAll('.btn-icon-link.cc-text').forEach((el) => {
+      stamp(el, 'sub_menu_item', toValue(el.textContent));
+    });
+
+    // Overlay cover links (empty text) — value from the destination slug.
+    nav.querySelectorAll('a.u-link-cover').forEach((el) => {
+      stamp(el, 'sub_menu_item', toValue(el.textContent) || slugValue(el));
+    });
+
+    // Primary CTA — Get in touch (also strips the legacy empty data-track-* it ships with).
+    nav.querySelectorAll('.btn-icon-link:not(.cc-text)').forEach((el) => {
+      stamp(el, 'button', toValue(el.textContent));
+    });
+  }
+
+  // Whitepaper banner — component instance that sits above/outside the nav.
+  // Value is static per the paid team's spec; also strips the legacy scheme.
   scope.querySelectorAll('.nav-banner-wrapper').forEach((wrapper) => {
     stamp(wrapper, 'banner', 'whitepaper');
     const link = wrapper.querySelector('a');
     if (link) stamp(link, 'banner', 'whitepaper');
-  });
-
-  // --- Service cards (mega-menu): per-service value only ---
-  // Webflow already sets event/name/type statically on these links;
-  // JS only fills the dynamic value from the card heading (keeps "&").
-  scope.querySelectorAll('.nav a.u-link-cover[href^="/services/"]').forEach((el) => {
-    const card = el.closest('.card') || el.parentElement;
-    const heading = card && card.querySelector('.heading-text, h1, h2, h3, h4, h5, h6');
-    const value = toValue(heading && heading.textContent)
-      || ((el.getAttribute('href') || '').split('/').pop() || '').replace(/-/g, ' ');
-    if (value) el.setAttribute('data-track-interaction-value', value);
   });
 }

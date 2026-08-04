@@ -67,7 +67,7 @@ function init() {
   // Page-scoped modules
   if (document.querySelector('.nav'))               initNavScrollHide(document);
   if (has('[data-menu-wrap]'))                      initMegaNav();
-  if (document.querySelector('.nav'))               initNavTrack(document);
+  if (has('[data-menu-wrap]') || has('.nav-banner-wrapper')) initNavTrack(document);
   if (has('[data-theme-toggle]'))                   initThemeToggle(document);
   if (has('details'))                               initAccordions(document);
   if (has('[data-tabs-component]'))                 initTabs(document);
