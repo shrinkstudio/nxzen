@@ -13,6 +13,7 @@ import { initFontSizeDetect, initFooterYear, initSkipLink } from './utilities.js
 import { initNavScrollHide } from './nav.js';
 import { initMegaNav } from './mega-nav.js';
 import { initNavTrack } from './nav-track.js';
+import { initContentTrack } from './content-track.js';
 import { initFormValidation } from './form-validate.js';
 import { initContentRevealScroll } from './reveal.js';
 import { initNumberOdometer } from './odometer.js';
@@ -68,6 +69,7 @@ function init() {
   if (document.querySelector('.nav'))               initNavScrollHide(document);
   if (has('[data-menu-wrap]'))                      initMegaNav();
   if (has('[data-menu-wrap]') || has('.nav-banner-wrapper')) initNavTrack(document);
+  if (has('a.btn-icon-link'))                       initContentTrack(document);
   if (has('[data-theme-toggle]'))                   initThemeToggle(document);
   if (has('details'))                               initAccordions(document);
   if (has('[data-tabs-component]'))                 initTabs(document);

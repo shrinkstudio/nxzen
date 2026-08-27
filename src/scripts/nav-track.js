@@ -96,11 +96,16 @@ export function initNavTrack(scope) {
     });
   }
 
-  // Whitepaper banner — component instance that sits above/outside the nav.
-  // Value is static per the paid team's spec; also strips the legacy scheme.
+  // Banner — dynamic value "banner-<key>". The key comes from the banner's own
+  // data-track-label (set per-banner in the CMS/Designer, e.g. "whitepaper"),
+  // falling back to the destination slug. Read the label BEFORE stamp() strips it,
+  // so the value reflects whatever campaign the (CMS-rotated) banner is showing.
   scope.querySelectorAll('.nav-banner-wrapper').forEach((wrapper) => {
-    stamp(wrapper, 'banner', 'whitepaper');
     const link = wrapper.querySelector('a');
-    if (link) stamp(link, 'banner', 'whitepaper');
+    const label = toValue(wrapper.getAttribute('data-track-label') || '');
+    const key = (label || (link ? slugValue(link) : '') || 'banner').trim().replace(/\s+/g, '-');
+    const value = 'banner-' + key;
+    stamp(wrapper, 'banner', value);
+    if (link) stamp(link, 'banner', value);
   });
 }
