@@ -28,7 +28,15 @@ export function initVimeoPlayer(scope) {
     var vimeoVideoID = vimeoElement.getAttribute('data-vimeo-video-id');
     if (!vimeoVideoID) return;
 
-    var vimeoVideoURL = 'https://player.vimeo.com/video/' + vimeoVideoID + '?api=1&background=1&autoplay=0&loop=0&muted=1';
+    // Vimeo background mode (background=1) forces the player silent and ignores
+    // volume. Reserve it for autoplay background loops. Click-to-play videos
+    // (autoplay="false") build a normal player so data-vimeo-muted="false" can play sound.
+    var wantsAutoplay = vimeoElement.getAttribute('data-vimeo-autoplay') === 'true';
+    var startMuted = vimeoElement.getAttribute('data-vimeo-muted') !== 'false';
+    var vimeoParams = wantsAutoplay
+      ? 'api=1&background=1&autoplay=0&loop=0&muted=1'
+      : 'api=1&background=0&controls=0&autoplay=0&loop=0&muted=' + (startMuted ? '1' : '0');
+    var vimeoVideoURL = 'https://player.vimeo.com/video/' + vimeoVideoID + '?' + vimeoParams;
     var iframe = vimeoElement.querySelector('iframe');
     if (!iframe) return;
     iframe.setAttribute('src', vimeoVideoURL);
