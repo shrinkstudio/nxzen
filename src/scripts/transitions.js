@@ -31,6 +31,7 @@ import { initAcceleratingGlobe } from './accelerating-globe.js';
 import { initCopyLink } from './copy-link.js';
 import { initPdfEmbed } from './pdf-embed.js';
 import { initHubspot, eagerLoadHubspot } from './hubspot.js';
+import { initListFilter } from './list-filter.js';
 
 gsap.registerPlugin(CustomEase);
 
@@ -93,6 +94,7 @@ function init() {
   if (has('[data-accelerating-globe]'))             initAcceleratingGlobe(document);
   if (has('[data-pdf-embed]'))                      initPdfEmbed(document);
   if (has('[data-hubspot]'))                        initHubspot(document);
+  if (has('[data-filter-list]'))                    initListFilter(document);
 
   // Theme
   applyTheme();
