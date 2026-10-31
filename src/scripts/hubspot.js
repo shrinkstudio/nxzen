@@ -19,6 +19,8 @@
 //     to dataLayer so GA4 conversions can be wired through GTM.
 // -----------------------------------------
 
+import { capture } from "./analytics.js";
+
 const DEFAULT_PORTAL = "148378852"; // nxzen — overridable via <meta name="hubspot-portal">
 const DEFAULT_REGION = "eu1";       // overridable via <meta name="hubspot-region">
 
@@ -80,6 +82,7 @@ function renderForm(el, { portalId, region }) {
         formId,
         pageUrl: window.location.href,
       });
+      capture("form_submitted", { form_name: formId, form_type: "hubspot" }, { send_instantly: true });
     },
   });
 }

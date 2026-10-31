@@ -31,6 +31,7 @@ import { initAcceleratingGlobe } from './accelerating-globe.js';
 import { initCopyLink } from './copy-link.js';
 import { initPdfEmbed } from './pdf-embed.js';
 import { initHubspot, eagerLoadHubspot } from './hubspot.js';
+import { initAnalytics } from './analytics.js';
 import { initListFilter } from './list-filter.js';
 
 gsap.registerPlugin(CustomEase);
@@ -65,6 +66,7 @@ function init() {
   // Eagerly fetch third-party embeds so they're cached + globals are ready
   // by the time the user navigates to a page that uses them.
   eagerLoadHubspot();
+  initAnalytics();
 
   // Page-scoped modules
   if (document.querySelector('.nav'))               initNavScrollHide(document);

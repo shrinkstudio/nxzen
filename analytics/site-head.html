@@ -1,0 +1,94 @@
+<!-- PostHog: loads only after statistics consent -->
+<script data-cookieconsent="ignore">
+(function () {
+  var token = 'phc_z88j67UnoS8dUyA85kQ7oaUwFwHwQUh8u5PgVPnTipLt';
+  var requested = false;
+
+  function cleanUrl(value) {
+    try {
+      var url = new URL(value);
+      Array.from(url.searchParams.keys()).forEach(function (key) {
+        if (!/^utm_/.test(key)) url.searchParams.delete(key);
+      });
+      return url.href;
+    } catch (e) {
+      return value;
+    }
+  }
+
+  function init() {
+    window.posthog.init(token, {
+      api_host: 'https://eu.i.posthog.com',
+      ui_host: 'https://eu.posthog.com',
+      person_profiles: 'identified_only',
+      capture_pageview: true,
+      capture_pageleave: true,
+      session_recording: { maskAllInputs: true },
+      before_send: function (event) {
+        var props = event && event.properties;
+        if (props) {
+          ['$current_url', '$referrer', '$session_entry_url'].forEach(function (key) {
+            if (props[key]) props[key] = cleanUrl(props[key]);
+          });
+        }
+        return event;
+      },
+      loaded: function (ph) {
+        if (ph.has_opted_out_capturing()) ph.opt_in_capturing();
+        ph.register({ page_type: location.pathname.split('/')[1] || 'home' });
+      }
+    });
+  }
+
+  function load() {
+    if (requested) return;
+    requested = true;
+    var s = document.createElement('script');
+    s.src = 'https://eu-assets.i.posthog.com/static/array.js';
+    s.async = true;
+    s.setAttribute('data-cookieconsent', 'ignore');
+    s.onload = init;
+    document.head.appendChild(s);
+  }
+
+  function clear() {
+    var ph = window.posthog;
+    if (ph && ph.opt_out_capturing) {
+      ph.stopSessionRecording();
+      ph.opt_out_capturing();
+      ph.set_config({ disable_persistence: true, opt_out_capturing_by_default: true });
+    }
+    var key = 'ph_' + token + '_posthog';
+    try {
+      localStorage.removeItem(key);
+      localStorage.removeItem('__ph_opt_in_out_' + token);
+      sessionStorage.removeItem(key);
+    } catch (e) {}
+    document.cookie = key + '=; Max-Age=0; path=/; domain=.nxzen.com';
+    document.cookie = key + '=; Max-Age=0; path=/';
+  }
+
+  function sync() {
+    var c = window.Cookiebot;
+    if (!c || !c.consent) return;
+    var ok = c.consent.statistics === true;
+    if (c.hasResponse) (window.orbitQ = window.orbitQ || []).push(['consent', ok]);
+    if (location.hostname !== 'www.nxzen.com') return;
+    if (ok) {
+      var ph = window.posthog;
+      if (ph && ph.has_opted_out_capturing && ph.has_opted_out_capturing()) {
+        ph.set_config({ disable_persistence: false });
+        ph.opt_in_capturing();
+      }
+      load();
+    } else if (c.hasResponse) {
+      clear();
+    }
+  }
+
+  window.addEventListener('CookiebotOnConsentReady', sync);
+  window.addEventListener('CookiebotOnAccept', sync);
+  window.addEventListener('CookiebotOnDecline', sync);
+  sync();
+})();
+</script>
